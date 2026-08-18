@@ -13,6 +13,17 @@ export interface UseExperimentResult {
    * True when the assignment is "active", false otherwise.
    */
   inExperiment: boolean;
+  /**
+   * Whether the organization is enrolled in the experiment at all, i.e. whether
+   * Flagpole handed back an assignment for it.
+   *
+   * This is distinct from `experimentAssignment === 'control'`. That value falls
+   * through to "control" both for genuinely control-assigned organizations and
+   * for organizations that were never enrolled, so callers that need to tell
+   * those apart — for example to avoid counting unenrolled organizations in a
+   * control denominator — must use this instead.
+   */
+  isEnrolled: boolean;
 }
 
 export interface UseExperimentOptions {
@@ -36,12 +47,18 @@ export interface UseExperimentOptions {
 
 /**
  * Open-source fallback: gates on organization.features with no exposure logging.
+ *
+ * Assignment still comes from organization.experiments, which the organization
+ * details API populates via get_experiment_assignments(). It is empty without
+ * an entity handler, in which case nothing is enrolled.
  */
 function useNoopExperiment(options: UseExperimentOptions): UseExperimentResult {
   const organization = useOrganization();
+  const assignment = organization.experiments?.[options.feature];
   return {
     inExperiment: organization.features.includes(options.feature),
-    experimentAssignment: 'control',
+    experimentAssignment: assignment ?? 'control',
+    isEnrolled: assignment !== undefined,
   };
 }
 
