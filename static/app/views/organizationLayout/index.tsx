@@ -38,6 +38,7 @@ import {SeerExplorerSessionsProvider} from 'sentry/views/seerExplorer/seerExplor
 import {SeerExplorerContextProvider} from 'sentry/views/seerExplorer/useSeerExplorerContext';
 
 import {OrganizationDetailsBody} from './body';
+import {PeterTestEmbeddedAlert} from 'sentry/components/sendoExperiment/peterTestEmbeddedAlert';
 
 const OrganizationHeader = OverrideOrDefault({
   overrideName: 'component:organization-header',
@@ -106,6 +107,7 @@ function AppLayout({organization}: LayoutProps) {
             <Override name="component:superuser-warning" organization={organization} />
           )}
           <SystemAlerts className="messages-container" />
+          {organization && <PeterTestEmbeddedAlert organization={organization} />}
         </Container>
         <Flex
           flex="1"

@@ -58,6 +58,8 @@ import type {DynamicSamplingEventParameters} from './analytics/dynamicSamplingAn
 import {dynamicSamplingEventMap} from './analytics/dynamicSamplingAnalyticsEvents';
 import type {EcosystemEventParameters} from './analytics/ecosystemAnalyticsEvents';
 import {ecosystemEventMap} from './analytics/ecosystemAnalyticsEvents';
+import type {ExperimentEventParameters} from './analytics/experimentAnalyticsEvents';
+import {experimentEventMap} from './analytics/experimentAnalyticsEvents';
 import type {FeedbackEventParameters} from './analytics/feedbackAnalyticsEvents';
 import {feedbackEventMap} from './analytics/feedbackAnalyticsEvents';
 import type {GrowthEventParameters} from './analytics/growthAnalyticsEvents';
@@ -134,6 +136,7 @@ interface EventParameters
     SettingsEventParameters,
     TeamInsightsEventParameters,
     DynamicSamplingEventParameters,
+    ExperimentEventParameters,
     OnboardingEventParameters,
     GamingAnalyticsEventParameters,
     StackTraceEventParameters,
@@ -181,6 +184,7 @@ const allEventMap: Record<string, string | null> = {
   ...settingsEventMap,
   ...workflowEventMap,
   ...dynamicSamplingEventMap,
+  ...experimentEventMap,
   ...onboardingEventMap,
   ...gamingEventMap,
   ...stackTraceEventMap,
