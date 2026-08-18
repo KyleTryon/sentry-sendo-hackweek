@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import Sequence
-from functools import cache
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from django.contrib.auth.models import AnonymousUser
 
     from sentry.features.base import Feature
+    from sentry.features.manager import FeatureManager
     from sentry.models.organization import Organization
     from sentry.models.project import Project
     from sentry.organizations.services.organization.model import RpcOrganization
@@ -56,7 +57,7 @@ def is_enabled() -> bool:
     return os.environ.get(ENV_VAR) == "1"
 
 
-@cache
+@lru_cache(maxsize=8)
 def _load_features_cached(path: str, mtime: float) -> dict[str, FlagpoleFeature]:
     """
     Parse the local flagpole.yaml into features keyed by feature name.
@@ -68,8 +69,16 @@ def _load_features_cached(path: str, mtime: float) -> dict[str, FlagpoleFeature]
     devserver's autoreloader only watches Python files, and requiring a restart
     to change a rollout percentage would make the local loop tedious.
     """
-    with open(path) as config_file:
-        parsed = yaml.safe_load(config_file) or {}
+    try:
+        with open(path) as config_file:
+            parsed = yaml.safe_load(config_file) or {}
+    except (OSError, yaml.YAMLError):
+        # A dev convenience must not break feature checks. FeatureManager.has()
+        # does not wrap entity-handler calls, so raising here would turn a
+        # missing or malformed config into failing page loads rather than a
+        # fall-through to SENTRY_FEATURES.
+        logger.warning("Could not read %s; falling back to SENTRY_FEATURES.", path)
+        return {}
 
     options: dict[str, Any] = parsed.get("options") or {}
 
@@ -209,7 +218,7 @@ class DevFlagpoleFeatureHandler(FeatureHandler):
         return assignments
 
 
-def register_if_enabled(manager: Any) -> bool:
+def register_if_enabled(manager: FeatureManager) -> bool:
     """
     Register the dev handler, but only in development and only if nothing else
     claimed the slot.

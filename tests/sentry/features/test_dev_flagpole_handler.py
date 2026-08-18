@@ -163,6 +163,30 @@ class DevFlagpoleShippedConfigTest(TestCase):
         assert handler.has(OrganizationFeature(FEATURE, self.organization), self.user) is None
 
 
+class DevFlagpoleMissingConfigTest(TestCase):
+    """
+    FeatureManager.has() does not wrap entity-handler calls, so raising here
+    would turn a missing config into failing page loads rather than a
+    fall-through to SENTRY_FEATURES.
+    """
+
+    def test_missing_config_falls_through(self) -> None:
+        handler = DevFlagpoleFeatureHandler(config_path="/nonexistent/flagpole.yaml")
+
+        assert handler.features_by_name == {}
+        assert handler.has(OrganizationFeature(FEATURE, self.organization), self.user) is None
+        assert handler.get_experiment_assignments(self.organization) == {}
+
+    def test_malformed_config_falls_through(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "flagpole.yaml"
+            path.write_text("options: [this is not a mapping\n")
+            handler = DevFlagpoleFeatureHandler(config_path=str(path))
+
+            assert handler.features_by_name == {}
+            assert handler.has(OrganizationFeature(FEATURE, self.organization), self.user) is None
+
+
 class DevFlagpoleManagerIntegrationTest(TestCase):
     """
     The seam that matters: FeatureManager delegating to the entity handler is
