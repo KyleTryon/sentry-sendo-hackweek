@@ -9,6 +9,7 @@ import {PictureInPictureProvider} from '@sentry/scraps/pictureInPicture';
 import {DemoHeader} from 'sentry/components/demo/demoHeader';
 import {useFeatureFlagOnboardingDrawer} from 'sentry/components/events/featureFlags/onboarding/featureFlagOnboardingSidebar';
 import {useFeedbackOnboardingDrawer} from 'sentry/components/feedback/feedbackOnboarding/sidebar';
+import {useTestExpModal} from 'sentry/components/sendoExperiment/useTestExpModal';
 import * as Layout from 'sentry/components/layouts/thirds';
 import {Override} from 'sentry/components/override';
 import {OverrideOrDefault} from 'sentry/components/overrideOrDefault';
@@ -83,6 +84,7 @@ function AppDrawers() {
   useProfilingOnboardingDrawer();
   useFeatureFlagOnboardingDrawer();
   useReleasesDrawer();
+  useTestExpModal();
 
   return null;
 }

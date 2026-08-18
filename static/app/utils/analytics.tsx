@@ -16,6 +16,10 @@ import {
   type ExploreAnalyticsEventParameters,
 } from 'sentry/utils/analytics/exploreAnalyticsEvents';
 import {
+  experimentAnalyticsEventMap,
+  type ExperimentAnalyticsEventParameters,
+} from 'sentry/utils/analytics/experimentAnalyticsEvents';
+import {
   featureFlagEventMap,
   type FeatureFlagEventParameters,
 } from 'sentry/utils/analytics/featureFlagAnalyticsEvents';
@@ -117,6 +121,7 @@ interface EventParameters
     CoreUIEventParameters,
     DashboardsEventParameters,
     DiscoverEventParameters,
+    ExperimentAnalyticsEventParameters,
     FeatureFlagEventParameters,
     FeedbackEventParameters,
     InsightEventParameters,
@@ -159,6 +164,7 @@ const allEventMap: Record<string, string | null> = {
   ...coreUIEventMap,
   ...dashboardsEventMap,
   ...discoverEventMap,
+  ...experimentAnalyticsEventMap,
   ...featureFlagEventMap,
   ...feedbackEventMap,
   ...growthEventMap,
