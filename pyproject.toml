@@ -262,6 +262,7 @@ ignore = [
 "src/sentry/build/*" = ["T20"]
 "tools/*" = ["T20"]
 "src/flagpole/*" = ["T20"]
+".agents/skills/*/scripts/*" = ["T20"] # agent skill CLIs; print is the output
 "**/migrations/*" = ["I"]
 
 [tool.ruff.lint.isort]

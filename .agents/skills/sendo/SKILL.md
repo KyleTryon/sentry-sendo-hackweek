@@ -8,7 +8,7 @@ description: Create, run, analyze, and retire in-product experiments and guides 
 Declare an experiment as data. Flagpole assigns, the platform's `useExperiment`
 hook resolves and reports exposure, and the Sendo framework renders and measures.
 
-Read `SPEC.md` for the design rationale and the honest limits of what this
+Read `references/SPEC.md` for the design rationale and the honest limits of what this
 measures. Read `references/platform.md` before changing anything about
 assignment — Sentry has more than one experimentation system and they do not all
 mean the same thing by "exposure".
@@ -269,7 +269,7 @@ about.
   no free text. See `references/metrics.md`.
 - Copy and links live in registry `content`, never in attributes.
 - Never present a difference between arms as significant. This POC has no
-  statistical machinery; see the Known Limitations section of `SPEC.md`.
+  statistical machinery; see the Known Limitations section of `references/SPEC.md`.
 - Never describe Sendo's exposure count and the platform's `experiment.exposure`
   count as measuring the same thing. See `references/platform.md`.
 

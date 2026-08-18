@@ -122,7 +122,7 @@ Three consequences shape Sendo's design:
    `assignment === 'active'`, so it stays consistent with the platform and with
    local tooling. The cost is that render and variant can disagree when no entity
    handler is installed; the framework warns in dev and
-   `references/analysis.md` has a query-side check.
+   `analysis.md` has a query-side check.
 2. **`hasExperimentAssignment` is the enrollment signal**, computed by gsApp and
    used to gate exposure — but not returned. Sendo needs it, because emitting a
    control exposure for every org that loads the page would flood the control arm
@@ -356,7 +356,7 @@ be stated whenever results are presented.
 
 They will not agree, by construction. Sendo's is a render record; the platform's
 is an encounter record. Both are legitimate. Conflating them is not.
-`references/analysis.md` cross-checks the ratio rather than expecting equality.
+`analysis.md` cross-checks the ratio rather than expecting equality.
 
 ## Runtime Contract
 
@@ -396,13 +396,13 @@ PR descriptions:
 ## Reference Architecture
 
 - `SKILL.md` — routing table, the add/conclude/remove procedures, constraints
-- `references/platform.md` — how Flagpole, `useExperiment`, gsApp, the BigQuery
+- `platform.md` — how Flagpole, `useExperiment`, gsApp, the BigQuery
   pipeline, and the BI `ab_testing` dataset relate; what is and is not in this repo
-- `references/metrics.md` — the metric and attribute taxonomy
-- `references/analysis.md` — Metrics Explorer queries and what they support
-- `references/recipes.md` — runnable answers to recurring operational questions
-- `references/dashboards.md` — reusable dashboard template and the API rules it obeys
-- `references/local-setup.md` — running it locally, and the traps
+- `metrics.md` — the metric and attribute taxonomy
+- `analysis.md` — Metrics Explorer queries and what they support
+- `recipes.md` — runnable answers to recurring operational questions
+- `dashboards.md` — reusable dashboard template and the API rules it obeys
+- `local-setup.md` — running it locally, and the traps
 
 ## Validation
 
@@ -484,7 +484,7 @@ State these plainly whenever results are presented.
   assignment.
 - **Assignment authority is split.** The Flagpole-native path and the BI tool's
   cohorts in the `super-big-data.ab_testing` BigQuery dataset are not
-  automatically the same assignment. See `references/platform.md`.
+  automatically the same assignment. See `platform.md`.
 
 Long-term direction: one system owns assignment, the experiment key enters the
 bucketing hash, exposure semantics are preserved, and one canonical
@@ -494,7 +494,7 @@ assignment/exposure model feeds BigQuery and Amplitude.
 
 - Update `SKILL.md` when the add/conclude/remove procedure changes, or when a new
   element joins the catalog.
-- Update `references/metrics.md` when an attribute is added — and only add
+- Update `metrics.md` when an attribute is added — and only add
   attributes with bounded value sets.
 - When an experiment concludes, follow the removal procedure in `SKILL.md` rather
   than leaving a dead registry entry in place.
