@@ -25,6 +25,7 @@ mean the same thing by "exposure".
 | Change what an experiment looks like                     | [The element catalog](#the-element-catalog)           |
 | Read results, compute CTR                                | `references/analysis.md`                              |
 | Build a dashboard for an experiment                      | `references/dashboards.md`                            |
+| Answer a question about what is running                  | `references/recipes.md`                               |
 | Run it locally                                           | `references/local-setup.md`                           |
 | Turn an experiment off or delete it                      | [Conclude and remove](#conclude-and-remove)           |
 | Understand the metric attributes                         | `references/metrics.md`                               |
@@ -74,6 +75,9 @@ report `variant: control` for a rendered treatment element and are unusable. See
 ## Before Any Change: Read The Registry
 
 **Never create an experiment without checking the registry first.**
+
+`references/recipes.md` has a one-command listing, plus a drift audit that
+cross-checks the registry against the flags and the mounts.
 
 ```bash
 cat static/app/utils/experiments/experiments.tsx

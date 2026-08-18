@@ -400,6 +400,7 @@ PR descriptions:
   pipeline, and the BI `ab_testing` dataset relate; what is and is not in this repo
 - `references/metrics.md` — the metric and attribute taxonomy
 - `references/analysis.md` — Metrics Explorer queries and what they support
+- `references/recipes.md` — runnable answers to recurring operational questions
 - `references/dashboards.md` — reusable dashboard template and the API rules it obeys
 - `references/local-setup.md` — running it locally, and the traps
 
