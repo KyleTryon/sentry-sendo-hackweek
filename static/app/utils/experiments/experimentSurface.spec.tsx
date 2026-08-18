@@ -133,7 +133,7 @@ describe('ExperimentSurface', () => {
     expect(exposures()).toHaveLength(1);
   });
 
-  it('records a cta_clicked action', async () => {
+  it('records a cta-clicked action', async () => {
     renderSurface(
       OrganizationFixture({features: [FEATURE], experiments: {[FEATURE]: 'active'}})
     );
@@ -203,6 +203,50 @@ describe('ExperimentSurface', () => {
     renderSurface(OrganizationFixture());
 
     expect(setAttribute).not.toHaveBeenCalled();
+  });
+
+  describe('development warning', () => {
+    let warn: jest.SpyInstance;
+    const nodeEnv = process.env.NODE_ENV;
+
+    beforeEach(() => {
+      warn = jest.spyOn(console, 'warn').mockImplementation(jest.fn());
+      (process.env as {NODE_ENV?: string}).NODE_ENV = 'development';
+    });
+
+    afterEach(() => {
+      (process.env as {NODE_ENV?: string}).NODE_ENV = nodeEnv;
+    });
+
+    it('warns when the flag is on but Flagpole assigned no arm', () => {
+      renderSurface(OrganizationFixture({features: [FEATURE]}));
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('no Flagpole assignment')
+      );
+    });
+
+    it('stays quiet for an enrolled organization in the control arm', () => {
+      // The flag can be on while the assignment is control — via SENTRY_FEATURES
+      // locally, for instance. That is a legitimate state, not unusable data.
+      renderSurface(
+        OrganizationFixture({features: [FEATURE], experiments: {[FEATURE]: 'control'}})
+      );
+
+      expect(warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('no Flagpole assignment')
+      );
+    });
+
+    it('stays quiet for an enrolled organization in the active arm', () => {
+      renderSurface(
+        OrganizationFixture({features: [FEATURE], experiments: {[FEATURE]: 'active'}})
+      );
+
+      expect(warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('no Flagpole assignment')
+      );
+    });
   });
 
   it('renders nothing and emits nothing once the experiment is concluded', () => {

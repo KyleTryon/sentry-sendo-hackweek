@@ -1,3 +1,5 @@
+import {useEffect} from 'react';
+
 import {useAnalyticsArea} from 'sentry/components/analyticsArea';
 import {FloatingCtaWindow} from 'sentry/utils/experiments/elements/floatingCtaWindow';
 import {
@@ -49,14 +51,17 @@ function ActiveExperiment({
   const {content, element, onCtaClick, onDismiss, shouldRender} =
     useExperimentSurface(experiment);
 
-  if (process.env.NODE_ENV === 'development' && area && !area.startsWith(surface)) {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development' || !area || area.startsWith(surface)) {
+      return;
+    }
     // eslint-disable-next-line no-console
     console.warn(
       `[sendo] surface "${surface}" is mounted inside AnalyticsArea "${area}". ` +
         `Surface names should match the area a page publishes so the attribute ` +
         `stays joinable with ordinary analytics.`
     );
-  }
+  }, [area, surface]);
 
   if (!shouldRender) {
     return null;

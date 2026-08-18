@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import * as Sentry from '@sentry/react';
 
 import {recordAction, recordExposure} from 'sentry/utils/experiments/experimentMetrics';
@@ -95,16 +95,20 @@ export function useExperimentSurface(
     if (process.env.NODE_ENV !== 'development') {
       return;
     }
-    if (inExperiment && experimentAssignment !== 'active') {
+    // Not `experimentAssignment !== 'active'`: an enrolled organization assigned
+    // to control legitimately reports control, and warning about it would train
+    // people to ignore this. The unusable state is specifically "the flag is on
+    // but Flagpole never assigned an arm".
+    if (inExperiment && !isEnrolled) {
       // eslint-disable-next-line no-console
       console.warn(
-        `[sendo] "${experiment}" rendered from organization.features with no ` +
-          `Flagpole assignment, so its metrics report variant "control" for a ` +
+        `[sendo] "${experiment}" is rendering from organization.features but has ` +
+          `no Flagpole assignment, so its metrics report variant "control" for a ` +
           `treatment element. Data collected in this state is unusable. Run ` +
           `with SENDO_LOCAL_FLAGPOLE=1 — see .agents/skills/sendo/references/local-setup.md.`
       );
     }
-  }, [experiment, experimentAssignment, inExperiment]);
+  }, [experiment, inExperiment, isEnrolled]);
 
   const onCtaClick = useCallback(() => {
     recordAction({experiment, variant, action: 'cta-clicked'});
@@ -115,8 +119,10 @@ export function useExperimentSurface(
     dismiss();
   }, [dismiss, experiment, variant]);
 
+  const content = useMemo(() => definition.content(), [definition]);
+
   return {
-    content: definition.content(),
+    content,
     element: definition.element,
     onCtaClick,
     onDismiss,
