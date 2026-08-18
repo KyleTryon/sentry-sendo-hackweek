@@ -117,6 +117,52 @@ should not trust.
 
 Read `analysis.md` before believing the rest. `org:read` is sufficient.
 
+## End an experiment
+
+An experiment leaves traces in four places, and the dashboard is the one people
+forget — it keeps showing a number nobody is maintaining.
+
+```bash
+SENTRY_TOKEN=... .agents/skills/sendo/scripts/end_experiment.py <experiment> --org <org>
+```
+
+```
+Ending experiment: logs-cta
+
+1. Registry entry
+     static/app/utils/experiments/experiments.tsx:2  'logs-cta': {
+2. Feature flag (separate backend PR)
+     src/sentry/features/temporary.py:1  manager.add("organizations:experiment-logs-cta", ...)
+3. Mount for surface 'explore.logs'
+     static/app/views/explore/logs/content.tsx:2
+     remove only if no other experiment targets this surface
+4. Dashboard
+     #9633813  Sendo · logs-cta
+       https://sentry.io/organizations/<org>/dashboard/9633813/
+```
+
+It reports the three source edits rather than performing them. Rewriting
+TypeScript and Python by regex is how you get a broken build, and the mount in
+particular needs judgement: remove it only if no other experiment targets that
+surface.
+
+The dashboard it will delete for you, because that is the step that gets skipped:
+
+```bash
+SENTRY_TOKEN=... .agents/skills/sendo/scripts/end_experiment.py <experiment> \
+  --org <org> --delete-dashboard --yes
+```
+
+Without `--yes` it names what it would delete and stops. **Record the results
+first.** Deleting the dashboard does not delete the metrics — they stay queryable
+under `experiment.id:<experiment>` — but it removes the only place anyone was
+reading them, and nothing else will reconstruct the layout.
+
+Concluding is different from removing. Setting `status: 'concluded'` stops the
+element rendering and stops metric emission while leaving history intact; do that
+the moment a decision is made. Removal comes later, once the numbers live
+somewhere durable. `SKILL.md` has both procedures.
+
 ## Which arm is an organization in
 
 For a local organization, without waiting for telemetry:

@@ -245,12 +245,26 @@ untouched and remains queryable. Do this the moment a decision is made.
 Note that this is a frontend deploy, not an instant kill. A true kill switch is a
 PR to `sentry-options-automator` disabling the flag, which also has to deploy.
 
-**Remove** — delete it, once results are recorded somewhere durable:
+**Remove** — delete it, once results are recorded somewhere durable.
+
+Start by finding every artifact, so none is left behind:
+
+```bash
+.agents/skills/sendo/scripts/end_experiment.py <experiment> --org <org>
+```
+
+It reports all four and performs none of the source edits — regexing
+TypeScript and Python is how you get a broken build:
 
 1. Delete the registry entry.
 2. Delete the flag from `temporary.py` (separate backend PR).
 3. If the surface now has no experiments, remove the `<ExperimentSurface>` mount.
-4. Run `pnpm run typecheck` — TypeScript surfaces every stale reference.
+4. Delete the experiment's dashboard, once its numbers are written down
+   somewhere durable. Add `--delete-dashboard --yes` to have the script do it.
+5. Run `pnpm run typecheck` — TypeScript surfaces every stale reference.
+
+Deleting the dashboard does not delete the metrics. It deletes the only place
+anyone was reading them, which is why step 4 comes after recording results.
 
 Removing the registry entry also stops the `experiment.arm.<id>` scope attribute,
 since it is only set while the surface mounts. Nothing else needs unsetting.
