@@ -1,0 +1,15 @@
+# Flagpole rollout config for sendo-logs-help-modal-q3.
+# Deploy to sentry-options-automator under key:
+#   feature.organizations:sendo-logs-help-modal-q3
+created_at: "2026-08-18T16:49:01"
+enabled: true
+experiment_mode: simple
+owner:
+  team: sendo
+segments:
+  - name: pcmccarron
+    rollout: 100
+    conditions:
+      - property: organization_slug
+        operator: equals
+        value: pcmccarron
