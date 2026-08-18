@@ -1,0 +1,13 @@
+feature.organizations:sendo-branch-fix-verify:
+  created_at: '2026-08-18T17:00:19'
+  enabled: true
+  experiment_mode: simple
+  owner:
+    team: sendo
+  segments:
+    - name: pcmccarron
+      rollout: 100
+      conditions:
+        - property: organization_slug
+          operator: equals
+          value: pcmccarron

@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import {Stack} from '@sentry/scraps/layout';
 
 import {AnalyticsArea} from 'sentry/components/analyticsArea';
+import {BranchFixVerifyModalExperiment} from 'sentry/components/sendoExperiment/branchFixVerifyModalExperiment';
 import {FeedbackButton} from 'sentry/components/feedbackButton/feedbackButton';
 import {PageFiltersContainer} from 'sentry/components/pageFilters/container';
 import {PageHeadingQuestionTooltip} from 'sentry/components/pageHeadingQuestionTooltip';
@@ -73,7 +74,10 @@ export default function LogsContent() {
                       datePageFilterProps={datePageFilterProps}
                     />
                   ) : (
-                    <LogsTabContent datePageFilterProps={datePageFilterProps} />
+                    <Fragment>
+                      <BranchFixVerifyModalExperiment />
+                      <LogsTabContent datePageFilterProps={datePageFilterProps} />
+                    </Fragment>
                   )}
                 </LogsPageDataProvider>
               </LogsQueryParamsProvider>
