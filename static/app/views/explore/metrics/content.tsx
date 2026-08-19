@@ -11,6 +11,7 @@ import {SentryDocumentTitle} from 'sentry/components/sentryDocumentTitle';
 import {t} from 'sentry/locale';
 import {DataCategory} from 'sentry/types/core';
 import {defined} from 'sentry/utils/defined';
+import {ExperimentSurface} from 'sentry/utils/experiments/experimentSurface';
 import {decodeScalar} from 'sentry/utils/queryString';
 import {useDatePageFilterProps} from 'sentry/utils/useDatePageFilterProps';
 import {useLocation} from 'sentry/utils/useLocation';
@@ -53,6 +54,7 @@ export default function MetricsContent() {
         }
       >
         <AnalyticsArea name="explore.metrics">
+          <ExperimentSurface surface="explore.metrics" />
           <Stack flex={1}>
             <MultiMetricsQueryParamsProvider>
               <MetricsHeader />

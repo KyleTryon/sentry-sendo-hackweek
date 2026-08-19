@@ -14,6 +14,24 @@ import type {ExperimentDefinition, Surface} from 'sentry/utils/experiments/types
  * See `.agents/skills/sendo/SKILL.md`.
  */
 export const EXPERIMENTS = {
+  'pcm-metrics-test': {
+    hypothesis:
+      'Organizations exploring metrics may not know support resources are available; a modal on the metrics page should increase clicks to metrics documentation.',
+    owner: 'sendo',
+    surface: 'explore.metrics',
+    element: 'modal',
+    status: 'active',
+    content: () => ({
+      heading: t('Need help with Metrics?'),
+      body: t(
+        'Metrics are a great way to track what is happening inside of your application. If you need some help getting set up, you can book some 1:1 time with our engineers.'
+      ),
+      ctaLabel: t('Get Help'),
+      ctaTarget: 'https://docs.sentry.io/product/metrics',
+      badgeText: t('New!'),
+      modalPlacement: 'bottom_right',
+    }),
+  },
   'pcm-logs-test': {
     hypothesis:
       'Organizations exploring logs may not know support is available; an inline banner should increase clicks to logs resources.',
