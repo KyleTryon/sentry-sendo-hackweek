@@ -13,6 +13,7 @@ import {t} from 'sentry/locale';
 import {DataCategory} from 'sentry/types/core';
 import {LogsAnalyticsPageSource} from 'sentry/utils/analytics/logsAnalyticsEvent';
 import {defined} from 'sentry/utils/defined';
+import {ExperimentSurface} from 'sentry/utils/experiments/experimentSurface';
 import {useDatePageFilterProps} from 'sentry/utils/useDatePageFilterProps';
 import {SHORT_VIEWPORT_HEIGHT} from 'sentry/utils/useIsShortViewport';
 import {useMaxPickableDays} from 'sentry/utils/useMaxPickableDays';
@@ -58,6 +59,7 @@ export default function LogsContent() {
         }
       >
         <AnalyticsArea name="explore.logs">
+          <ExperimentSurface surface="explore.logs" />
           <AiQueryProvider>
             <LogsPageStack flex={1} data-footer-constrained data-hide-footer>
               <LogsQueryParamsProvider
