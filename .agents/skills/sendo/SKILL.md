@@ -207,7 +207,9 @@ backing option defaults to `{}` and the flag evaluates to `False`. Default-off i
 structural, not a convention.
 
 Turning it into a real experiment additionally requires `experiment_mode: simple`
-in that repo's Flagpole config — out of scope for this POC.
+in that repo's Flagpole config. That repo is deliberately outside this skill: it
+is where rollout decisions are made and reviewed, and nothing here should be
+changing it on someone's behalf.
 
 **This file is backend (`src/`). It must be a separate PR from any `static/`
 change — CI enforces this, because frontend and backend are not atomically
@@ -351,8 +353,9 @@ about.
 - Metric attributes are bounded string unions — no URLs, no copy, no org slugs,
   no free text. See `references/metrics.md`.
 - Copy and links live in registry `content`, never in attributes.
-- Never present a difference between arms as significant. This POC has no
-  statistical machinery; see the Known Limitations section of `references/SPEC.md`.
+- Never present a difference between arms as significant. There is no
+  statistical machinery here — no significance test, no confidence interval, no
+  power calculation. See Known Limitations in `references/SPEC.md`.
 - Never describe Sendo's exposure count and the platform's `experiment.exposure`
   count as measuring the same thing. See `references/platform.md`.
 

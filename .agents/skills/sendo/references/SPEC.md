@@ -1,8 +1,12 @@
 # Sendo Experiments Specification
 
-> **Status: Hack Week 2026 proof of concept.** Every experiment is default-off in
-> every environment. No production Flagpole rollout config exists, and no customer
-> has been exposed to anything described here.
+> **What is and is not proven.** The declaration, assignment, render, and
+> measurement path has been exercised end to end against real Flagpole
+> evaluation and real telemetry. What has not been exercised is a production
+> rollout: every experiment is default-off in every environment, no Flagpole
+> rollout config exists, and no customer has been exposed to anything here.
+> Outcome measurement and statistics do not exist at all — see Known
+> Limitations.
 
 ## Intent
 
@@ -307,7 +311,7 @@ segments and rollout YAML live in the separate `sentry-options-automator` repo
 (see the default path at `src/flagpole/flagpole_eval.py:71`) and ship through
 GoCD. With no entry there, the option defaults to `{}`, the flag evaluates to
 `False`, and nothing renders. **Default-off is structural, not a convention** —
-this POC cannot reach a customer without a PR landing in another repo.
+nothing here can reach a customer without a PR landing in another repo.
 
 The corollary: the kill switch is a commit plus a deploy, not a button.
 
@@ -450,7 +454,8 @@ is an encounter record. Both are legitimate. Conflating them is not.
   - Exposure fires once per mount per user, for both arms.
   - Metric attribute values are bounded string unions. No URLs, no copy, no
     org slugs, no free text.
-  - Dismissal state is client-side only (`localStorage`) for the POC.
+  - Dismissal state is client-side only (`localStorage`), so dismissal rate is
+    biased downward.
 
 ## Source And Evidence Model
 

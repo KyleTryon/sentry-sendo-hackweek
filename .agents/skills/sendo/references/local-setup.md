@@ -122,7 +122,8 @@ back to the top will break startup with `AppRegistryNotReady`.
 | `SENDO_LOCAL_FLAGPOLE=1`, rollout excludes | No      | `control`            | Yes         |
 
 **Do not add rollout configuration to `sentry-options-automator`.** Local
-overrides only, for the duration of the POC.
+overrides only. Rollout config is reviewed and deployed in that repo, and a
+local experiment never needs it.
 
 ## 4. A Known Local Failure
 
