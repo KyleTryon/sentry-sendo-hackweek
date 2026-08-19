@@ -14,7 +14,7 @@ function TestComponent({
   feature: string;
   reportExposure: boolean;
 }) {
-  const {inExperiment, experimentAssignment} = useExperiment({
+  const {inExperiment, experimentAssignment, isEnrolled} = useExperiment({
     feature,
     reportExposure,
   });
@@ -22,6 +22,7 @@ function TestComponent({
     <div>
       <span data-test-id="in-experiment">{String(inExperiment)}</span>
       <span data-test-id="assignment">{experimentAssignment}</span>
+      <span data-test-id="is-enrolled">{String(isEnrolled)}</span>
     </div>
   );
 }
@@ -64,6 +65,24 @@ describe('useExperiment (gsApp)', () => {
     });
     expect(screen.getByTestId('in-experiment')).toHaveTextContent('true');
     expect(screen.getByTestId('assignment')).toHaveTextContent('control');
+  });
+
+  it('distinguishes an unenrolled organization from a control assignment', () => {
+    const unenrolled = OrganizationFixture({features: ['test-experiment']});
+    const {unmount} = render(
+      <TestComponent feature="test-experiment" reportExposure={false} />,
+      {organization: unenrolled}
+    );
+    expect(screen.getByTestId('assignment')).toHaveTextContent('control');
+    expect(screen.getByTestId('is-enrolled')).toHaveTextContent('false');
+    unmount();
+
+    const control = OrganizationFixture({experiments: {'test-experiment': 'control'}});
+    render(<TestComponent feature="test-experiment" reportExposure={false} />, {
+      organization: control,
+    });
+    expect(screen.getByTestId('assignment')).toHaveTextContent('control');
+    expect(screen.getByTestId('is-enrolled')).toHaveTextContent('true');
   });
 
   it('returns control when experiment is not present', () => {

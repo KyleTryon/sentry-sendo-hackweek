@@ -103,5 +103,9 @@ export function useExperiment(options: UseExperimentOptions): UseExperimentResul
     logExposure,
   ]);
 
-  return {inExperiment, experimentAssignment: assignment};
+  return {
+    inExperiment,
+    experimentAssignment: assignment,
+    isEnrolled: hasExperimentAssignment,
+  };
 }
