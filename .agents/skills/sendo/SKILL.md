@@ -30,6 +30,7 @@ mean the same thing by "exposure".
 | Turn an experiment off or delete it                      | [Conclude and remove](#conclude-and-remove)           |
 | Understand the metric attributes                         | `references/metrics.md`                               |
 | Understand how this relates to Flagpole, gsApp, BigQuery | `references/platform.md`                              |
+| See the whole experiment lifecycle                       | `references/SPEC.md` (Lifecycle)                      |
 
 ## Assignment Is Read, Never Computed
 

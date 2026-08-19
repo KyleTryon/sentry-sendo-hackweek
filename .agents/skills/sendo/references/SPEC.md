@@ -347,6 +347,81 @@ treatment stays consistent and reviewable:
 Copy and links live in the registry entry's `content`. They must never flow into
 metric attributes.
 
+## Lifecycle
+
+The architecture above is one page load. This is one experiment, from declaration
+to teardown — two actors on very different clocks, meeting where telemetry
+becomes results.
+
+```mermaid
+flowchart TB
+    subgraph author["Experimenter — days to weeks"]
+        declare["Registry entry<br/>surface · element · copy · status"]
+        flag["Feature flag in temporary.py<br/>api_expose: True"]
+        mount["Mount ExperimentSurface<br/>only if the surface is new"]
+        board["Dashboard<br/>references/dashboards.md"]
+        read["Read A · B · C · D<br/>scripts/experiment_results.sh"]
+        decide{"Ship, iterate, or drop?"}
+        conclude["status: concluded<br/>stops rendering and emitting<br/>history stays queryable"]
+        teardown["Remove entry · flag · mount · dashboard<br/>scripts/end_experiment.py"]
+    end
+
+    gate{{"sentry-options-automator PR<br/>experiment_mode: simple + rollout %<br/>a commit and a deploy, not a toggle"}}
+
+    subgraph org["Organization — one page load"]
+        bucket["Flagpole buckets on<br/>SHA1 of organization_id, mod 100"]
+        control["control arm<br/>nothing renders"]
+        active["active arm<br/>element renders"]
+        interact["clicks the CTA<br/>or dismisses it"]
+    end
+
+    subgraph signal["Telemetry — no code written per experiment"]
+        exposure["product.experiment.exposure<br/>both arms · experiment.rendered marks which saw it"]
+        action["product.experiment.action<br/>cta-clicked · dismissed"]
+        arm["SDK scope experiment.arm.id<br/>rides on spans and logs"]
+    end
+
+    declare --> flag --> mount --> gate
+    gate -->|"nothing reaches anyone until this deploys"| bucket
+    bucket --> control
+    bucket --> active
+    active --> interact
+    control --> exposure
+    active --> exposure
+    active --> arm
+    interact --> action
+    exposure --> board
+    action --> board
+    arm -.->|"guardrails: latency by arm"| board
+    board --> read --> decide
+    decide -->|"ship or drop"| conclude
+    decide -->|"iterate on copy or placement"| declare
+    conclude --> teardown
+```
+
+Four things in that picture are worth stating outright:
+
+- **The gate is a deploy, not a toggle.** Nothing reaches a single organization
+  until a `sentry-options-automator` PR lands and ships. The same is true in
+  reverse: turning an experiment off through Flagpole is another commit and
+  another deploy. Plan the abort path before the rollout, not during it.
+- **The two lanes never touch each other's code.** The experimenter writes a
+  registry entry and a flag. The organization's page emits exposure and
+  interaction metrics. Nobody writes metrics code in between, which is the
+  property the whole design exists to buy.
+- **Both arms produce telemetry.** Control emits exposure with
+  `experiment.rendered: false`, which is what makes the arms comparable at all.
+  An experiment where only the treatment arm reports has no denominator.
+- **Concluding and removing are separate steps.** `status: 'concluded'` stops
+  rendering and emission while leaving history queryable, so it is safe to do the
+  moment a decision is made. Teardown comes later, once the numbers live
+  somewhere durable — deleting the dashboard removes the only place anyone was
+  reading them.
+
+The loop back from the decision is the common case. Most experiments iterate on
+copy or placement before they ship or drop, and each iteration is a registry edit
+rather than a new component.
+
 ## Three Exposure Records
 
 **Sendo is the third system recording that an org saw an experiment.** This must
