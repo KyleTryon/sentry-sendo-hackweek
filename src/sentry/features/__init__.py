@@ -1,3 +1,6 @@
+from sentry.features.dev_flagpole_handler import (
+    register_if_enabled as register_dev_flagpole_handler,
+)
 from sentry.features.permanent import register_permanent_features
 from sentry.features.temporary import register_temporary_features
 
@@ -53,6 +56,10 @@ default_manager = FeatureManager()  # NOQA
 
 register_permanent_features(default_manager)
 register_temporary_features(default_manager)
+
+# Development only, and a no-op unless SENDO_LOCAL_FLAGPOLE=1. Never displaces an
+# already-registered entity handler. See sentry.features.dev_flagpole_handler.
+register_dev_flagpole_handler(default_manager)
 
 # expose public api
 add = default_manager.add

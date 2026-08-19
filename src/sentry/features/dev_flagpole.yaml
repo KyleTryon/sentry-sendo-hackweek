@@ -1,0 +1,49 @@
+# Local Flagpole config for development. NOT deployed anywhere.
+#
+# Production segments and rollout live in the sentry-options-automator repo.
+# This file exists so local development can exercise real Flagpole evaluation
+# instead of an always-empty assignment map. It is only read when
+# SENDO_LOCAL_FLAGPOLE=1 — see .agents/skills/sendo/references/local-setup.md.
+#
+# The layout matches sentry-options-automator's options/default/flagpole.yaml,
+# so the same file works with:
+#   python -m flagpole.flagpole_eval --flagpole-file src/sentry/features/dev_flagpole.yaml ...
+#
+# Flags absent from this file return None from the handler and fall through to
+# SENTRY_FEATURES, so adding an entry here is opt-in per flag.
+#
+# To exercise an experiment locally, add its flag with experiment_mode: simple:
+#
+#   options:
+#     feature.organizations:experiment-my-experiment:
+#       enabled: true
+#       owner:
+#         team: my-team
+#       created_at: '2026-01-01T00:00:00.000000+00:00'
+#       experiment_mode: simple
+#       segments:
+#         # Segments are ordered and the FIRST match decides the outcome — its
+#         # rollout is used and later segments never run. A segment with
+#         # `conditions: []` matches everyone, so put narrow segments first. A
+#         # matching segment with `rollout: 0` disables the feature outright
+#         # rather than falling through. See references/platform.md.
+#         - name: early adopters only
+#           rollout: 100
+#           conditions:
+#             - property: organization_is-early-adopter
+#               operator: equals
+#               value: true
+#         - name: local development
+#           # An organization's bucket is NOT its id: context.id is a SHA1 of the
+#           # identity fields read as an integer, so org 1 sits in bucket 57. Use
+#           # rollout 100 to force the active arm, 0 to force control, or look up
+#           # your bucket and set a rollout either side of it. The comparison is
+#           # `bucket <= rollout` and inclusive.
+#           rollout: 100
+#           conditions: []
+#
+# The surface an experiment renders on may be behind its own flag — the logs
+# page needs organizations:ourlogs-enabled, and relay gates trace-metric
+# ingestion on organizations:tracemetrics-ingestion. Add those here too when the
+# experiment needs them.
+options: {}
