@@ -80,15 +80,28 @@ report `variant: control` for a rendered treatment element and are unusable. See
 one lands in a specific field and guessing produces an experiment that measures
 nothing useful:
 
-| Question                   | Where the answer goes                                                                                       |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Which page?                | `surface`, taken from the page's `AnalyticsArea` name                                                       |
-| What is the hypothesis?    | Nowhere in code — it belongs in the dashboard description, and it decides whether the result means anything |
-| What does the element say? | `content` — heading, body, CTA label, CTA target                                                            |
-| Which element?             | `element`, from [the catalog](#the-element-catalog)                                                         |
-| What counts as success?    | The metric you will read afterwards                                                                         |
+| Question                       | Field                                               | Required |
+| ------------------------------ | --------------------------------------------------- | -------- |
+| Which page?                    | `surface`, from the page's `AnalyticsArea` name     | yes      |
+| What is being tested, and why? | `hypothesis`                                        | yes      |
+| Who concludes this?            | `owner`                                             | yes      |
+| What does the element say?     | `content` — heading, body, CTA label, target        | yes      |
+| Which element?                 | `element`, from [the catalog](#the-element-catalog) | yes      |
+| What counts as success?        | Not a field — see below                             | —        |
 
-That last one deserves pushing on. Sendo measures **exposure and interaction** —
+**Every one of these is enforced.** `hypothesis` and `owner` are required
+properties on `ExperimentDefinition`, so an entry without them fails
+`pnpm run typecheck` with _"missing the following properties"_. The registry
+invariants test additionally rejects empty or trivial values, since the compiler
+can check that a string exists but not that anyone thought about it.
+
+Do not proceed to the registry entry without real answers. A placeholder
+hypothesis passes the compiler and defeats the point — it is what makes the
+numbers interpretable when someone re-reads them months later, and it is what the
+dashboard's description widget is built from.
+
+**Success is deliberately not a field.** Sendo measures **exposure and
+interaction** —
 whether the element was shown, and whether it was clicked or dismissed. It does
 not measure whether anyone went on to do the thing. If the answer is "we want to
 know whether more organizations set up logs", say plainly that this gives you a
@@ -146,6 +159,8 @@ registry are part of it:
 
 ```ts
 'logs-cta': {
+  hypothesis: 'Organizations without logs do not know the product exists; a CTA on the logs page should raise setup starts.',
+  owner: 'telemetry-experience',
   surface: 'explore.logs',
   element: 'floating-cta',
   status: 'active',

@@ -56,7 +56,9 @@ tested, what each arm sees, and how organizations were segmented.
   Widgets with no `layout` auto-flow and will collide with a pinned one, so once
   you pin the header, give every other widget an explicit layout too.
 
-Cover four things, drawn from the registry entry and the Flagpole config:
+Cover four things. Two come straight from the registry entry — `hypothesis` and
+`owner` are required fields precisely so this widget is not written from
+memory — and the rest from the Flagpole config:
 
 | Section                | Content                                                     |
 | ---------------------- | ----------------------------------------------------------- |
