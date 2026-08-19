@@ -20,8 +20,8 @@ mean the same thing by "exposure".
 
 | Request                                                  | Go to                                                 |
 | -------------------------------------------------------- | ----------------------------------------------------- |
-| Add an experiment to an existing surface                 | [Add an experiment](#add-an-experiment)               |
-| Add an experiment to a new surface                       | [Instrument a new surface](#instrument-a-new-surface) |
+| Add an experiment                                        | [Add an experiment](#add-an-experiment)               |
+| Instrument a page so experiments can run on it           | [Instrument a new surface](#instrument-a-new-surface) |
 | Change what an experiment looks like                     | [The element catalog](#the-element-catalog)           |
 | Read results, compute CTR                                | `references/analysis.md`                              |
 | Build a dashboard for an experiment                      | `references/dashboards.md`                            |
@@ -96,7 +96,23 @@ exposures become uninterpretable.
 
 ## Add An Experiment
 
-Two edits. One if the surface is already instrumented.
+**No page currently mounts `<ExperimentSurface>`.** Until one does, every
+experiment is a four-edit job:
+
+| #   | Edit                   | File                                           | Tree      |
+| --- | ---------------------- | ---------------------------------------------- | --------- |
+| 1   | Registry entry         | `static/app/utils/experiments/experiments.tsx` | `static/` |
+| 2   | Feature flag           | `src/sentry/features/temporary.py`             | `src/`    |
+| 3   | `Surface` union member | `static/app/utils/experiments/types.tsx`       | `static/` |
+| 4   | Mount                  | the page component                             | `static/` |
+
+Edits 1, 3, and 4 go in one pull request; edit 2 goes in another, because
+`static/` and `src/` are not atomically deployed and CI rejects a PR spanning
+both.
+
+Once a surface is instrumented, a second experiment on that same surface is
+edits 1 and 2 only — that is the path this design exists to make cheap, and it
+arrives with the second experiment rather than the first.
 
 ### 1. Registry entry — `static/app/utils/experiments/experiments.tsx`
 
@@ -162,11 +178,27 @@ in that repo's Flagpole config — out of scope for this POC.
 change — CI enforces this, because frontend and backend are not atomically
 deployed. `static/gsApp/` counts as frontend.**
 
-### 3. Mount — only if the surface is new
+### 3. Surface union — `static/app/utils/experiments/types.tsx`
 
-See [Instrument a new surface](#instrument-a-new-surface). If
-`<ExperimentSurface surface="..." />` is already mounted on the target page,
-skip this step entirely. That is the intended path.
+`Surface` is a closed union, so a new surface has to be added before the registry
+entry will type-check:
+
+```ts
+export type Surface = 'explore.logs' | 'issue-details';
+```
+
+Take the name from the `AnalyticsArea` the page already publishes — see
+[Instrument a new surface](#instrument-a-new-surface).
+
+### 4. Mount — unless the surface already has one
+
+```bash
+grep -rn '<ExperimentSurface' static/app --include='*.tsx' | grep -v '\.spec\.'
+```
+
+Empty output means the page needs the mount; see
+[Instrument a new surface](#instrument-a-new-surface). If the target page already
+has it, skip this step.
 
 ### What you must NOT write
 
