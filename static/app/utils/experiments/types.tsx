@@ -12,7 +12,7 @@
  * `surface` attribute is joinable with ordinary analytics. Do not invent a name
  * here — take it from the page's `<AnalyticsArea name="...">`.
  */
-export type Surface = 'explore.logs' | 'explore.metrics';
+export type Surface = 'explore.logs';
 
 /**
  * A component from the element catalog. Experiments choose one; they never ship
@@ -20,7 +20,7 @@ export type Surface = 'explore.logs' | 'explore.metrics';
  *
  * Named `ElementName` rather than `Element` to avoid shadowing the DOM global.
  */
-export type ElementName = 'floating-cta' | 'modal' | 'page-banner';
+export type ElementName = 'floating-cta' | 'page-banner';
 
 /**
  * Flagpole's native assignment strings, used verbatim.
@@ -39,14 +39,12 @@ export type Action = 'cta-clicked' | 'dismissed';
  * when the locale may not be initialized yet.
  */
 export type ExperimentContent = () => {
-  alertSystem?: boolean;
-  alertVariant?: 'danger' | 'info' | 'muted' | 'success' | 'warning';
-  badgeText?: string;
   body: string;
   ctaLabel: string;
   ctaTarget: string;
   heading: string;
-  modalPlacement?: 'bottom_right' | 'center';
+  alertSystem?: boolean;
+  alertVariant?: 'danger' | 'info' | 'muted' | 'success' | 'warning';
 };
 
 export interface ExperimentDefinition {

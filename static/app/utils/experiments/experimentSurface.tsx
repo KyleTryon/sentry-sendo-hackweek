@@ -1,7 +1,6 @@
 import {useEffect} from 'react';
 
 import {useAnalyticsArea} from 'sentry/components/analyticsArea';
-import {ExperimentModal} from 'sentry/utils/experiments/elements/experimentModal';
 import {FloatingCtaWindow} from 'sentry/utils/experiments/elements/floatingCtaWindow';
 import {PageBanner} from 'sentry/utils/experiments/elements/pageBanner';
 import {
@@ -17,7 +16,6 @@ import {useExperimentSurface} from 'sentry/utils/experiments/useExperimentSurfac
 
 const ELEMENTS: Record<ElementName, React.ComponentType<ExperimentElementProps>> = {
   'floating-cta': FloatingCtaWindow,
-  modal: ExperimentModal,
   'page-banner': PageBanner,
 };
 
