@@ -171,13 +171,14 @@ Two consequences, both load-bearing:
 1. **Exposure is emitted for both arms.** Control users emit exposure with
    `rendered: false`. Without this the arms are not comparable, because you would
    have a denominator for active and none for control.
-2. **Only the active arm can reach `action`.** Clicks and dismissals are
+2. **Only the active arm can reach `product.experiment.action`.** Clicks and dismissals are
    structurally impossible for control, which is why CTR must be denominated on
    `rendered:true` rather than on all exposures.
 
 ## Architecture
 
-One page load, traced across the planes:
+One page load, traced across the planes. `logs-cta` is illustrative — the
+registry ships empty, and an experiment is added when it runs:
 
 ```mermaid
 flowchart TB
@@ -202,9 +203,10 @@ flowchart TB
     end
 
     subgraph plane4["4 · Measurement — Application Metrics"]
-        expControl["product.experiment.exposure<br/>variant control · rendered false"]
-        expActive["product.experiment.exposure<br/>variant active · rendered true"]
+        expControl["product.experiment.exposure<br/>experiment.variant control<br/>experiment.rendered false"]
+        expActive["product.experiment.exposure<br/>experiment.variant active<br/>experiment.rendered true"]
         action["product.experiment.action<br/>cta-clicked · dismissed"]
+        scope["SDK scope<br/>experiment.arm.logs-cta = variant"]
     end
 
     subgraph plane5["5 · Analysis — Metrics Explorer"]
@@ -217,6 +219,8 @@ flowchart TB
     flag --> hook
     assign --> hook
     hook --> platformExp
+    hook --> scope
+    scope -.->|decorates every span and log too| query
     hook --> notEnrolled
     hook --> controlArm
     hook --> activeArm
@@ -261,8 +265,9 @@ This mirrors the aggregation pattern already used by
 `static/app/utils/analytics.tsx`, which combines per-domain event maps into one
 typed registry.
 
-The registry is the reason this is maintainable. Because `experiment`, `variant`,
-`surface`, and `element` attributes are all derived from the registry entry,
+The registry is the reason this is maintainable. Because `experiment.id`,
+`experiment.variant`, `experiment.surface`, and `experiment.element` are all
+derived from the registry entry,
 **metric emission lives in the framework, not in the experiment**. A new
 experiment cannot ship with a typo'd attribute, a missing exposure event, or an
 inconsistent metric name, because it does not write any metrics code.
@@ -322,7 +327,7 @@ a nesting string context with a dotted convention (`explore.logs`,
 `feedback.details`), and the logs page already declares
 `<AnalyticsArea name="explore.logs">` at
 `static/app/views/explore/logs/content.tsx:60`. Sendo reuses those names so its
-`surface` attribute is joinable with ordinary analytics.
+`experiment.surface` attribute is joinable with ordinary analytics.
 
 Sendo keeps its own typed `Surface` union rather than reading
 `useAnalyticsArea()` directly — that component's docstring says app logic "should

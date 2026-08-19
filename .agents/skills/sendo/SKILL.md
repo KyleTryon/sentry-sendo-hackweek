@@ -44,10 +44,10 @@ const {inExperiment, experimentAssignment} = useExperiment({
 
 Two values, two different jobs, and they come from different places:
 
-| Value                  | Source                                    | Sendo uses it for       |
-| ---------------------- | ----------------------------------------- | ----------------------- |
-| `inExperiment`         | `organization.features.includes(feature)` | Whether to render       |
-| `experimentAssignment` | `organization.experiments[feature]`       | The `variant` attribute |
+| Value                  | Source                                    | Sendo uses it for                  |
+| ---------------------- | ----------------------------------------- | ---------------------------------- |
+| `inExperiment`         | `organization.features.includes(feature)` | Whether to render                  |
+| `experimentAssignment` | `organization.experiments[feature]`       | The `experiment.variant` attribute |
 
 This split is deliberate on the platform's side — see
 `static/gsApp/overrides/useExperiment.tsx`, which gates `inExperiment` on
@@ -191,7 +191,7 @@ metrics trustworthy.
    surface also adds the mount.
    If the page has no `AnalyticsArea`, add one first — it is the existing
    convention for naming a region of the UI, and reusing it keeps Sendo's
-   `surface` attribute joinable with ordinary analytics.
+   `experiment.surface` attribute joinable with ordinary analytics.
 
    The framework asserts in dev that `useAnalyticsArea()` agrees with the declared
    surface. Note it only warns: `AnalyticsArea` nests, so an inner area can
