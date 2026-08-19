@@ -1,3 +1,4 @@
+import {t} from 'sentry/locale';
 import type {ExperimentDefinition, Surface} from 'sentry/utils/experiments/types';
 
 /**
@@ -12,7 +13,26 @@ import type {ExperimentDefinition, Surface} from 'sentry/utils/experiments/types
  *
  * See `.agents/skills/sendo/SKILL.md`.
  */
-export const EXPERIMENTS = {} satisfies Record<string, ExperimentDefinition>;
+export const EXPERIMENTS = {
+  'pcm-logs-test': {
+    hypothesis:
+      'Organizations exploring logs may not know support is available; an inline banner should increase clicks to logs resources.',
+    owner: 'sendo',
+    surface: 'explore.logs',
+    element: 'page-banner',
+    status: 'active',
+    content: () => ({
+      heading: t('Need help with Logs?'),
+      body: t(
+        'Book a 1:1 appointment with one of our engineers to help you get started with or improve your Sentry logs!'
+      ),
+      ctaLabel: t('Book Now'),
+      ctaTarget: 'https://docs.sentry.io/product/logs',
+      alertVariant: 'info',
+      alertSystem: false,
+    }),
+  },
+} satisfies Record<string, ExperimentDefinition>;
 
 export type ExperimentId = keyof typeof EXPERIMENTS;
 

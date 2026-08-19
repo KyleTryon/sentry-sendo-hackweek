@@ -20,7 +20,7 @@ export type Surface = 'explore.logs';
  *
  * Named `ElementName` rather than `Element` to avoid shadowing the DOM global.
  */
-export type ElementName = 'floating-cta';
+export type ElementName = 'floating-cta' | 'page-banner';
 
 /**
  * Flagpole's native assignment strings, used verbatim.
@@ -39,6 +39,8 @@ export type Action = 'cta-clicked' | 'dismissed';
  * when the locale may not be initialized yet.
  */
 export type ExperimentContent = () => {
+  alertSystem?: boolean;
+  alertVariant?: 'danger' | 'info' | 'muted' | 'success' | 'warning';
   body: string;
   ctaLabel: string;
   ctaTarget: string;
