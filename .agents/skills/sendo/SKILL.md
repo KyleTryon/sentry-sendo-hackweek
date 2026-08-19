@@ -11,27 +11,30 @@ hook resolves and reports exposure, and the Sendo framework renders and measures
 Read `references/SPEC.md` for the design rationale and the honest limits of what this
 measures. Read `references/platform.md` before changing anything about
 assignment — Sentry has more than one experimentation system and they do not all
-mean the same thing by "exposure".
+mean the same thing by "exposure". Read `references/scraps-components.md` before
+implementing or changing any experiment element — experiment UI is built from
+`@sentry/scraps`, not from sendo-ui clones or one-off styled components.
 
 **Every experiment is default-off. Never add rollout configuration to the
 `sentry-options-automator` repo.**
 
 ## Routing
 
-| Request                                                  | Go to                                                 |
-| -------------------------------------------------------- | ----------------------------------------------------- |
-| Add an experiment                                        | [Start here](#start-here-what-is-being-tested)        |
-| Instrument a page so experiments can run on it           | [Instrument a new surface](#instrument-a-new-surface) |
-| Change what an experiment looks like                     | [The element catalog](#the-element-catalog)           |
-| Read results, compute CTR                                | `references/analysis.md`                              |
-| Build a dashboard for an experiment                      | `references/dashboards.md`                            |
-| Answer a question about what is running                  | `references/recipes.md`                               |
-| Run it locally                                           | `references/local-setup.md`                           |
-| Turn an experiment off or delete it                      | [Conclude and remove](#conclude-and-remove)           |
-| Understand the metric attributes                         | `references/metrics.md`                               |
-| Understand how this relates to Flagpole, gsApp, BigQuery | `references/platform.md`                              |
-| Target which organizations are eligible                  | `references/platform.md` (Segmentation)               |
-| See the whole experiment lifecycle                       | `references/SPEC.md` (Lifecycle)                      |
+| Request                                                  | Go to                                                                             |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Add an experiment                                        | [Start here](#start-here-what-is-being-tested)                                    |
+| Instrument a page so experiments can run on it           | [Instrument a new surface](#instrument-a-new-surface)                             |
+| Change what an experiment looks like                     | [The element catalog](#the-element-catalog) and `references/scraps-components.md` |
+| Implement or restyle an experiment element               | `references/scraps-components.md`                                                 |
+| Read results, compute CTR                                | `references/analysis.md`                                                          |
+| Build a dashboard for an experiment                      | `references/dashboards.md`                                                        |
+| Answer a question about what is running                  | `references/recipes.md`                                                           |
+| Run it locally                                           | `references/local-setup.md`                                                       |
+| Turn an experiment off or delete it                      | [Conclude and remove](#conclude-and-remove)                                       |
+| Understand the metric attributes                         | `references/metrics.md`                                                           |
+| Understand how this relates to Flagpole, gsApp, BigQuery | `references/platform.md`                                                          |
+| Target which organizations are eligible                  | `references/platform.md` (Segmentation)                                           |
+| See the whole experiment lifecycle                       | `references/SPEC.md` (Lifecycle)                                                  |
 
 ## Assignment Is Read, Never Computed
 
@@ -295,6 +298,10 @@ mount adds no layout box and cannot shift the page.
 
 ## The Element Catalog
 
+**Read `references/scraps-components.md` before writing any experiment UI.** It
+is the import map, payload-to-catalog mapping, and forbidden patterns. Do not
+copy sendo-ui (`src/components/ui/*`) or invent a one-off page component.
+
 Experiments select an element; they do not ship bespoke UI.
 
 | Element        | Use when                                         | Status  |
@@ -310,10 +317,10 @@ Adding a new element:
    `experimentSurface.tsx`. The union is named `ElementName` rather than
    `Element` to avoid shadowing the DOM global.
 3. The element calls `onCtaClick` and `onDismiss` and nothing else — it must not
-   emit metrics or read assignment itself.
-
-Build elements from `@sentry/scraps` primitives (`Flex`, `Stack`, `Text`,
-`Heading`) per `static/AGENTS.md`, not hand-rolled styled components.
+   emit metrics or read assignment itself. Compose it from `@sentry/scraps`
+   per `references/scraps-components.md` (and `static/AGENTS.md` / the
+   `design-system` skill for tokens). Never import Tailwind clones or
+   `sentry/components/ui`.
 
 ## Conclude And Remove
 
