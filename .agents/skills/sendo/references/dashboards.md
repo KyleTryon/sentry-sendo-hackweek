@@ -271,7 +271,7 @@ two-series form above, not a two-column group-by.
 
 At full rollout there is one variant, so a variant-grouped chart shows a single
 series. That is correct. Under a real rollout expect four combinations, and
-**control + rendered:true should always be zero** — a non-zero value there means
+**control with `tags[experiment.rendered,boolean]:true` should always be zero** — a non-zero value there means
 the element drew for someone who should not have seen it, and the window is
 unusable. See `analysis.md`.
 

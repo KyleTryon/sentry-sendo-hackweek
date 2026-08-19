@@ -163,6 +163,37 @@ element rendering and stops metric emission while leaving history intact; do tha
 the moment a decision is made. Removal comes later, once the numbers live
 somewhere durable. `SKILL.md` has both procedures.
 
+## Check the docs for drift
+
+The skill describes attribute names, query syntax, and a diagram that all
+reference code. Twice they have gone stale silently — the architecture diagram
+kept labelling attributes with pre-namespace names, and query examples used bare
+boolean keys that match nothing and return zero rather than erroring. Both look
+correct until someone runs a query and gets an empty result.
+
+```bash
+.agents/skills/sendo/scripts/check_docs.py
+```
+
+A line that must name one of these patterns deliberately can opt out with an
+inline `check-docs:allow` comment — this file uses one just above.
+
+It runs automatically on any change under `.agents/skills/sendo/*.md` via the
+`sendo-skill-docs` pre-commit hook, and exits non-zero on a finding.
+
+It checks three things, all of which have actually happened:
+
+- a bare attribute name used as a query key, when they are namespaced under
+  `experiment.`
+- `experiment.rendered` queried without `tags[...,boolean]`, which silently
+  matches nothing
+- the snake_case click action, from before values became kebab-case <!-- check-docs:allow -->
+
+It cannot check the mermaid diagrams, which need a real parser. To validate
+those, install `mermaid` in a scratch directory and call `mermaid.parse()` with
+jsdom globals — full rendering needs a browser and fails under jsdom, but parse
+validation catches syntax errors.
+
 ## Which arm is an organization in
 
 For a local organization, without waiting for telemetry:
