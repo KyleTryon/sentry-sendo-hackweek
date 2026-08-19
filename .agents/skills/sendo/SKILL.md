@@ -20,7 +20,7 @@ mean the same thing by "exposure".
 
 | Request                                                  | Go to                                                 |
 | -------------------------------------------------------- | ----------------------------------------------------- |
-| Add an experiment                                        | [Add an experiment](#add-an-experiment)               |
+| Add an experiment                                        | [Start here](#start-here-what-is-being-tested)        |
 | Instrument a page so experiments can run on it           | [Instrument a new surface](#instrument-a-new-surface) |
 | Change what an experiment looks like                     | [The element catalog](#the-element-catalog)           |
 | Read results, compute CTR                                | `references/analysis.md`                              |
@@ -74,6 +74,31 @@ framework logs a dev warning for exactly this. Metrics emitted in that state
 report `variant: control` for a rendered treatment element and are unusable. See
 `references/local-setup.md`.
 
+## Start Here: What Is Being Tested
+
+"Add an experiment" is not enough to act on. Establish these first, because each
+one lands in a specific field and guessing produces an experiment that measures
+nothing useful:
+
+| Question                   | Where the answer goes                                                                                       |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Which page?                | `surface`, taken from the page's `AnalyticsArea` name                                                       |
+| What is the hypothesis?    | Nowhere in code — it belongs in the dashboard description, and it decides whether the result means anything |
+| What does the element say? | `content` — heading, body, CTA label, CTA target                                                            |
+| Which element?             | `element`, from [the catalog](#the-element-catalog)                                                         |
+| What counts as success?    | The metric you will read afterwards                                                                         |
+
+That last one deserves pushing on. Sendo measures **exposure and interaction** —
+whether the element was shown, and whether it was clicked or dismissed. It does
+not measure whether anyone went on to do the thing. If the answer is "we want to
+know whether more organizations set up logs", say plainly that this gives you a
+click-through rate and not an adoption number, and that closing the gap needs
+outcome instrumentation that does not exist yet. See Known Limitations in
+`references/SPEC.md`.
+
+Also ask whether they want a dashboard. It is the step people skip, and
+`references/dashboards.md` has a template that takes two substitutions.
+
 ## Before Any Change: Read The Registry
 
 **Never create an experiment without checking the registry first.**
@@ -116,6 +141,9 @@ arrives with the second experiment rather than the first.
 
 ### 1. Registry entry — `static/app/utils/experiments/experiments.tsx`
 
+Add an entry to `EXPERIMENTS` — do not replace the file, the helpers below the
+registry are part of it:
+
 ```ts
 'logs-cta': {
   surface: 'explore.logs',
@@ -128,6 +156,13 @@ arrives with the second experiment rather than the first.
     ctaTarget: '/settings/projects/',
   }),
 },
+```
+
+The registry ships empty, so the **first** entry also needs the import that was
+removed when the last experiment was torn out:
+
+```ts
+import {t} from 'sentry/locale';
 ```
 
 `content` is a function, not an object, so `t()` runs at render rather than at
