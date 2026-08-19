@@ -69,7 +69,9 @@ The segmentation section is the one people get wrong. State that assignment is
 **org-scoped**, that bucketing is a **SHA1 of `organization_id`** rather than the
 id itself, that the comparison is inclusive, and that the feature name is absent
 from the hash so concurrent experiments at the same rollout share a population.
-See `platform.md`.
+See the Segmentation and Bucketing sections of `platform.md`, and state the
+segment conditions as well as the rollout — eligibility and arm split are
+different things, and a reader cannot infer the first from the second.
 
 Carry the caveats from `analysis.md` into the closing section verbatim. A
 dashboard confers authority that the underlying data may not have earned.

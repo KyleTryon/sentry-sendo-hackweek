@@ -115,6 +115,88 @@ assignment, and a measurement plane beside the BigQuery pipeline.
 Sendo's exposure metric is a _render_ record. The platform's `experiment.exposure`
 is an _encounter_ record. See the three-exposure-records table in `SPEC.md`.
 
+## Segmentation
+
+Bucketing decides _how many_ organizations get the treatment. Segmentation decides
+_which ones are eligible in the first place_, and it runs first.
+
+A flag holds an ordered list of segments. Each has conditions and its own rollout:
+
+```yaml
+segments:
+  - name: early adopters, fully on
+    rollout: 100
+    conditions:
+      - property: organization_is-early-adopter
+        operator: equals
+        value: true
+  - name: everyone else, half
+    rollout: 50
+    conditions: []
+```
+
+### First match wins, and it is final
+
+`Feature.match()` walks the segments in order, and **the first one whose
+conditions match decides the outcome** — it returns that segment's
+`in_rollout(...)` and never looks at the rest (`src/flagpole/__init__.py:133`).
+
+Two consequences that bite:
+
+- **Order matters.** A segment with `conditions: []` matches everyone, so
+  anything below it is unreachable. Put narrow segments first.
+- **`rollout: 0` is a kill switch, not a skip.** A matching segment with zero
+  rollout returns `False` and stops evaluation, so it disables the feature for
+  that population _even if a later segment would have matched_. The code says so
+  explicitly (`src/flagpole/conditions.py`). That is how you carve an exclusion
+  out of a broad rollout.
+
+### Operators
+
+`in`, `not_in`, `contains`, `not_contains`, `equals`, `not_equals`, `matches`,
+`not_matches` — see `ConditionOperatorKind` in `src/flagpole/conditions.py`.
+
+### Properties you can actually segment on
+
+This is the short list, and it is shorter than people expect. Verified by
+building a real context in this repo:
+
+| Property                        | Notes                                    |
+| ------------------------------- | ---------------------------------------- |
+| `organization_id`               | Also the bucketing input                 |
+| `organization_slug`             |                                          |
+| `organization_name`             |                                          |
+| `organization_is-early-adopter` | Note the underscore-then-hyphen spelling |
+| `user_id`                       |                                          |
+| `user_is-staff`                 |                                          |
+| `user_is-superuser`             |                                          |
+
+**There is no plan, subscription, org age, or usage property here.** Those come
+from getsentry's context builder, which is not in this repo — so an experiment
+targeting "organizations on the Business plan" or "organizations created in the
+last 30 days" cannot be expressed or tested locally, only in production. If a
+proposal depends on that kind of targeting, confirm the property exists before
+promising the segment.
+
+To check what a given organization would produce:
+
+```bash
+SENDO_LOCAL_FLAGPOLE=1 sentry django shell -c "
+from sentry.features.flagpole_context import get_sentry_flagpole_context_builder, SentryContextData
+from sentry.models.organization import Organization
+org = Organization.objects.get(slug='<slug>')
+print(sorted(get_sentry_flagpole_context_builder().build(SentryContextData(organization=org)).to_dict()))
+"
+```
+
+### Segmentation and arms are different things
+
+A segment decides eligibility. The rollout inside it decides the arm. An
+organization outside every segment is **not enrolled** — it never appears in
+`organization.experiments`, emits nothing, and is not part of the control arm.
+Control means "eligible, and Flagpole assigned the control side", which is why
+`analysis.md` insists both arms produce exposure.
+
 ## The Bucketing Caveat
 
 `in_rollout()` hashes nothing but the org id:

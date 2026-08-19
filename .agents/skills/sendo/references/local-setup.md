@@ -78,6 +78,11 @@ layout, so the same file works with:
 .venv/bin/python -m flagpole.flagpole_eval --flagpole-file src/sentry/features/dev_flagpole.yaml --flag-name organizations:experiment-<your-experiment> --context '{"organization_id": 1}'
 ```
 
+Segments decide who is eligible before bucketing decides the arm. The list is
+ordered and the first match wins, so a segment with `conditions: []` matches
+everyone and shadows anything below it — see the Segmentation section in
+`platform.md`, which also lists the seven properties you can actually target.
+
 To move yourself between arms, edit `rollout` in that file: `0` puts every
 organization in control, `100` puts every organization in the active arm.
 Flagpole buckets on `context.id % 100` with an inclusive comparison, so `50` is
