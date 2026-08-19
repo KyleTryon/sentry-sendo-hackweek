@@ -16,6 +16,8 @@ const HEADING = 'Test heading';
 // independently of whatever experiments happen to be live.
 const TEST_EXPERIMENTS: Record<string, ExperimentDefinition> = {
   [TEST_ID]: {
+    hypothesis: 'Testing that the framework renders and measures.',
+    owner: 'sendo',
     surface: 'explore.logs',
     element: 'floating-cta',
     status: 'active',

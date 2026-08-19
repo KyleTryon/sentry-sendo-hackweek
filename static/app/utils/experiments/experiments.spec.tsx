@@ -38,6 +38,16 @@ describe('experiment registry invariants', () => {
     }
   });
 
+  it('states a hypothesis and an owner', () => {
+    // TypeScript guarantees the fields exist. It cannot guarantee anyone filled
+    // them in, and an empty hypothesis is the same as no hypothesis.
+    for (const [id, definition] of entries) {
+      expect(definition.hypothesis.trim().length).toBeGreaterThan(10);
+      expect(definition.owner.trim()).not.toBe('');
+      expect(definition.hypothesis).not.toContain(id);
+    }
+  });
+
   it('declares content that resolves to non-empty copy', () => {
     for (const [, definition] of entries) {
       const content = definition.content();

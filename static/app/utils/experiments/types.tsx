@@ -49,6 +49,21 @@ export interface ExperimentDefinition {
   content: ExperimentContent;
   element: ElementName;
   /**
+   * What this experiment is testing, in one sentence.
+   *
+   * Required, and deliberately so. It is the only field that makes a result
+   * interpretable months later, and it has no other home — the registry is the
+   * declarative record, and a hypothesis kept in a ticket or someone's head is a
+   * hypothesis nobody can check the numbers against. It is also what the
+   * dashboard's description widget is built from.
+   */
+  hypothesis: string;
+  /**
+   * The team or person answerable for concluding this. Concluded experiments
+   * that nobody owns are the stale-feature-flag problem with extra steps.
+   */
+  owner: string;
+  /**
    * `concluded` stops the element rendering and stops all metric emission,
    * while leaving historical data queryable.
    */
